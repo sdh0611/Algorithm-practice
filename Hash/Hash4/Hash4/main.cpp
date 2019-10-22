@@ -1,103 +1,126 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <set>
 #include <unordered_map>
 #include <algorithm>
 #include <iostream>
 
+/*
+	문제 설명
+	스트리밍 사이트에서 장르 별로 가장 많이 재생된 노래를 두 개씩 모아 베스트 앨범을 출시하려 합니다.노래는 고유 번호로 구분하며, 노래를 수록하는 기준은 다음과 같습니다.
+
+	속한 노래가 많이 재생된 장르를 먼저 수록합니다.
+	장르 내에서 많이 재생된 노래를 먼저 수록합니다.
+	장르 내에서 재생 횟수가 같은 노래 중에서는 고유 번호가 낮은 노래를 먼저 수록합니다.
+	노래의 장르를 나타내는 문자열 배열 genres와 노래별 재생 횟수를 나타내는 정수 배열 plays가 주어질 때, 베스트 앨범에 들어갈 노래의 고유 번호를 순서대로 return 하도록 solution 함수를 완성하세요.
+
+	제한사항
+	genres[i]는 고유번호가 i인 노래의 장르입니다.
+	plays[i]는 고유번호가 i인 노래가 재생된 횟수입니다.
+	genres와 plays의 길이는 같으며, 이는 1 이상 10, 000 이하입니다.
+	장르 종류는 100개 미만입니다.
+	장르에 속한 곡이 하나라면, 하나의 곡만 선택합니다.
+	모든 장르는 재생된 횟수가 다릅니다.
+
+	입출력 예
+	genres									plays								return
+	[classic, pop, classic, classic, pop], [500, 600, 150, 800, 2500], [4, 1, 3, 0]
+
+	입출력 예 설명
+	classic 장르는 1, 450회 재생되었으며, classic 노래는 다음과 같습니다.
+	고유 번호 3: 800회 재생
+	고유 번호 0 : 500회 재생
+	고유 번호 2 : 150회 재생
+	pop 장르는 3, 100회 재생되었으며, pop 노래는 다음과 같습니다.
+
+	고유 번호 4 : 2, 500회 재생
+	고유 번호 1 : 600회 재생
+	따라서 pop 장르의[4, 1]번 노래를 먼저, classic 장르의[3, 0]번 노래를 그다음에 수록합니다.
+*/
 
 using namespace std;
 
-vector<int> solution(vector<string> genres, vector<int> plays) 
+vector<int> solution(vector<string> Genres, vector<int> Plays) 
 {
-	vector<int> answer;
-
-	map<string, vector<pair<int, int>>> GenrePlayMap;
-	unordered_map<string, int> GenreTotalPlay;
-
-	/* Key 초기화 */
-	for (const auto& Genre : genres)
+	vector<int> Answer;
+	
+	typedef struct PlayInfo
 	{
-		GenrePlayMap.insert(std::make_pair(Genre, vector<pair<int, int>>()));
-		GenreTotalPlay.insert(std::make_pair(Genre, 0));
-	}
+		string GenreName;
+		int Play;
+		int ID;
 
-	/* Value 초기화 */
-	for (int i = 0; i < genres.size(); ++i)
-	{
-		GenrePlayMap[genres[i]].push_back(make_pair(i, plays[i]));
-		GenreTotalPlay[genres[i]] += plays[i];
-	}
-
-
-	/* 정렬 : PlayMap*/
-	{
-		auto Sort = [](pair<int, int> First, pair<int, int> Second) ->bool {
-			if (First.second == Second.second)
-			{
-				return First.first < Second.first;
-			}
-
-			return First.second > Second.second;
-		};
-		for (auto& Genre : GenrePlayMap)
+		PlayInfo()
 		{
-			sort(Genre.second.begin(), Genre.second.end(), Sort);
 		}
-	}
 
-	puts("Play 정렬");
-	for (const auto& Play : GenrePlayMap)
-	{
-		puts(Play.first.c_str());
-		for (const auto& Genre : Play.second)
+		PlayInfo(const string& NewGenre, int NewPlay, int NewID)
+			:GenreName(NewGenre), Play(NewPlay), ID(NewID)
 		{
-			cout << Genre.first << " : " << Genre.second << "\n";
 		}
-		puts("");
-	}
 
+	}PlayInfo;
 
-	/* 정렬 : Total Play */
-	vector<pair<string, int>> GenreTotalPlaySort;
-	for (const auto& Genre : GenreTotalPlay)
+	typedef struct TotalPlayInfo
 	{
-		GenreTotalPlaySort.push_back(Genre);
+		string GenreName;
+		int TotalPlay;
+
+		TotalPlayInfo()
+		{
+		}
+
+		TotalPlayInfo(const string& NewGenre, int NewPlay)
+			:GenreName(NewGenre), TotalPlay(NewPlay)
+		{
+		}
+
+	}TotalPlayInfo;
+
+
+	vector<PlayInfo> GenrePlay(Plays.size());
+	for (int i = 0; i < GenrePlay.size(); ++i)
+	{
+		GenrePlay[i].GenreName = Genres[i];
+		GenrePlay[i].Play = Plays[i];
+		GenrePlay[i].ID = i;
 	}
 
-	auto MapSort = [](pair<string, int> First, pair<string, int> Second)->bool {
-		return First.second > Second.second;
+
+	set<string> GenreSet;
+	for (const auto& GenreName : Genres)
+	{
+		GenreSet.insert(GenreName);
+	}
+	
+	map<string, int> GenreTotalPlay;
+	for (const auto& GenreName : GenreSet)
+	{
+		GenreTotalPlay.emplace(GenreName, 0);
+	}
+	
+	for (int i = 0; i < Genres.size(); ++i)
+	{
+		GenreTotalPlay[Genres[i]] += Plays[i];
+	}
+	
+	vector<pair<string, int>> SortingTotalPlay(GenreTotalPlay.begin(), GenreTotalPlay.end());
+	auto Sorting = [](pair<string, int> First, pair<string, int> Second)->bool {
+		return First.second < Second.second;
 	};
-	sort(GenreTotalPlaySort.begin(), GenreTotalPlaySort.end(), MapSort);
+	sort(SortingTotalPlay.begin(), SortingTotalPlay.end(), Sorting);
+	
 	GenreTotalPlay.clear();
-
-	for (auto& Genre : GenreTotalPlaySort)
+	for (const auto& Element : SortingTotalPlay)
 	{
-		GenreTotalPlay[Genre.first] = Genre.second;
-		cout << Genre.first << " : " << Genre.second << "\n";
+		GenreTotalPlay.insert(Element);
 	}
+	
+	
 
 
-	/* 출력 */
-	for (const auto& GenreTotal : GenreTotalPlaySort)
-	{
-		puts(GenreTotal.first.c_str());
-		for (const auto& GenrePlay : GenrePlayMap[GenreTotal.first])
-		{
-			answer.push_back(GenrePlay.first);
-		}
-
-	}
-
-	answer.pop_back();
-
-	for (const auto& Genre : answer)
-	{
-		cout << Genre << " ";
-	}
-	puts("");
-
-	return answer;
+	return Answer;
 }
 
 

@@ -4,66 +4,44 @@
 
 using namespace std;
 
-vector<int> solution(vector<int> Progresses, vector<int> Speeds) {
+vector<int> solution(vector<int> Progresses, vector<int> Speeds) 
+{
 	vector<int> Answer;
 
-	vector<bool> IsComplete;
-	for (int i = 0; i < Progresses.size(); ++i)
-	{
-		IsComplete.push_back(false);
-	}
+	int Publish = 0;
+	int Front = 0;
+	size_t Size = Progresses.size();
 
-	int PublishStack = 0;
-	int PublishNum = 0;
-
-	for(int Prog = 0; Prog < Progresses.size(); )
+	while (Front < Size)
 	{
-		for (int i = Prog; i < Progresses.size() && Prog < Progresses.size() ; ++i)
+		for (int i = Front; i < Size; ++i)
 		{
-			if (Progresses[i] < 100)  // 해당 Progress가 완료되지 않았을 때 
+			if (Progresses[i] < 100)
 			{
 				Progresses[i] += Speeds[i];
-				if (Progresses[i] >= 100)
-				{
-					IsComplete[i] = true;
-				}
 			}
-			else  // 해당 Progress를 완료했을 때 
+		}
+
+		for (int i = Front; i < Size; ++i)
+		{
+			if (Progresses[i] >= 100)
 			{
-				/* 맨 앞의 Progress가 완료되면 */
-				if (IsComplete[Prog])
+				if (i == Front)
 				{
-					int j = Prog;
-					for ( ; j < Progresses.size(); ++j)
-					{
-						if (IsComplete[j])
-						{
-							++PublishNum;
-						}
-						else
-						{
-							break;
-						}
-
-					}
-
-					Prog = j;
-					Answer.push_back(PublishNum);
-					PublishNum = 0;
-
+					++Publish;
+					++Front;
 				}
-
 			}
-
+		}
+		
+		if (Publish > 0)
+		{
+			cout << Publish << endl;
+			Answer.push_back(Publish);
+			Publish = 0;
 		}
 
 	}
-	
-	for (const auto& Num : Answer)
-	{
-		cout << Num << " ";
-	}
-	puts("");
 
 	return Answer;
 }
@@ -71,6 +49,7 @@ vector<int> solution(vector<int> Progresses, vector<int> Speeds) {
 int main()
 {
 	int Testcase = 0;
+	puts("Testcase 입력");
 	cin >> Testcase;
 
 	vector<int> Progresses;
