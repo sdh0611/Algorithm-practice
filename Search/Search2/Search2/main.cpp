@@ -1,8 +1,14 @@
+#include <iostream>
 #include <string>
 #include <algorithm>
 #include <set>
+#include <vector>
 
 using namespace std;
+
+set<int> Primes;
+vector<bool> Visited;
+string PrimeNumber;
 
 bool IsPrimeNumber(int Number)
 {
@@ -23,40 +29,30 @@ bool IsPrimeNumber(int Number)
 }
 
 
-int solution(string Numbers) 
+
+
+int solution(string Numbers)
 {
 	int Answer = 0;
-	set<int> Primes;
-
-	/* 1자리 소수 */
-	{
-		int Num = 0;
-		for (const auto& Number : Numbers)
-		{
-			int Num = atoi(&Number);
-			if (IsPrimeNumber(Num))
-			{
-				Primes.insert(Num);
-			}
-
-		}
-	}
 	
-	/* 2자리 이상의 소수 */
-	for (int Radix = 2; Radix <= Numbers.length(); ++Radix)
-	{
-		for (const auto& Number : Numbers)
-		{
-			string Num(&Number);
-			
+	PrimeNumber.assign(4, NULL);
+	Visited.assign(Numbers.length(), false);
+	
+	sort(Numbers.begin(), Numbers.end(), greater<char>());
 
-		}
-
-	}
 	
 
+	
 
 	Answer = Primes.size();
 
 	return Answer;
+}
+
+
+int main()
+{
+	solution("011");
+	
+	return 0;
 }
