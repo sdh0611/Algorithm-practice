@@ -11,18 +11,14 @@ int solution(vector<int> Citations)
 
 	sort(Citations.begin(), Citations.end());
 
-	vector<int> HIndices(Citations.size(), 0);
+	vector<int> HIndices;
+	vector<int> Remains;
 
-	for (int i = 0; i < Citations.size(); ++i)
-	{
-		//HIndices.push_back();
-		
-
-	}
+	
 
 
 	//int HIndex = Citations.size() / 2;
-	//
+	
 	//int Num = 0;
 
 	//while (Num != Citations[HIndex])
@@ -32,7 +28,6 @@ int solution(vector<int> Citations)
 	//	{
 	//		if (Element >= Citations[HIndex])
 	//		{
-	//			//++Num;
 	//			if (++Num > Citations[HIndex])
 	//			{
 	//				++HIndex;

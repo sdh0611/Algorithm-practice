@@ -29,9 +29,14 @@ bool CanConvert(string Word, string Other)
 	return true;
 }
 
-int DFS(string CurrentWord, string Target, const vector<string>& Words)
+bool DFS(int& Level, string CurrentWord, string Target, const vector<string>& Words)
 {
-	int Result = 0;
+	if (CurrentWord == Target)
+	{
+		return true;
+	}
+
+	bool Result = false;
 
 	for (const auto& Word : Words)
 	{
@@ -40,10 +45,15 @@ int DFS(string CurrentWord, string Target, const vector<string>& Words)
 			if (CanConvert(CurrentWord, Word))
 			{
 				UsingWord.insert(Word);
-				Result += DFS(Word, Target, Words);
+				Result = DFS(++Level, Word, Target, Words);
 				UsingWord.erase(Word);
 			}
 		}
+	}
+
+	if (!Result)
+	{
+		--Level;
 	}
 
 	return Result;
@@ -55,16 +65,29 @@ int solution(string Begin, string Target, vector<string> Words)
 	{
 		return 0;
 	}
-
+	
 	int Answer = 0;
 
 	vector<bool> Converted(Begin.length(), false);
 	
 	string CurrentWord = Begin;
 	
+	int Result = 0;
 	for (const auto& Word : Words)
 	{
-		Answer += DFS(CurrentWord, Target, Words);
+		if (Target == Word)
+		{
+			Answer = 1;
+			break;
+		}
+
+		if (DFS(Result, CurrentWord, Target, Words))
+		{
+			if (Answer > Result)
+			{
+				Answer = Result;
+			}
+		}
 	}
 
 	return Answer;
